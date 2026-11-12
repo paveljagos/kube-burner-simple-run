@@ -17,7 +17,7 @@ export PROMETHEUS_URL="https://$(oc get route prometheus-k8s -n openshift-monito
 export PROMETHEUS_TOKEN="$(oc create token prometheus-k8s -n openshift-monitoring --duration=6h)"
 
 
-
+cd ./tests
 kube-burner health-check
 time="2026-11-02 07:26:14" level=info msg="🏥 Checking for Cluster Health" file="cluster_health.go:14"
 
