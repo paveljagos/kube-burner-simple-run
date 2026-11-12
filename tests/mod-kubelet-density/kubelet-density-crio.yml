@@ -1,0 +1,58 @@
+---
+global:
+  gc: true
+  measurements:
+    - name: pprof
+      pprofInterval: 30m
+      pprofDirectory: /var/tmp/new-pprof-data
+      nodeAffinity:
+        kubernetes.io/hostname: "debian-worker"
+      pprofTargets:
+        - name: kubelet-heap
+          url: https://localhost:10250/debug/pprof/heap
+
+        - name: crio-heap
+          url: http://localhost:6060/debug/pprof/heap
+
+        - name: crio-goroutine
+          url: http://localhost:6060/debug/pprof/goroutine
+
+        - name: crio-block
+          url: http://localhost:6060/debug/pprof/block
+
+        - name: crio-allocs
+          url: http://localhost:6060/debug/pprof/allocs
+
+
+
+metricsEndpoints:
+  - endpoint: "{{ .PROMETHEUS_URL }}"
+    token: "{{ .PROMETHEUS_TOKEN }}"
+    skipTLSVerify: true
+    step: 30s
+    metrics:
+      - metrics.yaml
+    indexer:
+      type: local
+      metricsDirectory: collected-metrics-{{ .UUID }}
+      createTarball: true
+      tarballName: new-kubelet-density-metrics.tgz
+
+
+
+
+jobs:
+  - name: kubelet-density
+    jobIterations: 5
+    qps: 2
+    burst: 2
+    preLoadImages: false
+    namespacedIterations: false
+    namespace: kubelet-density
+    waitWhenFinished: true
+    podWait: false
+    objects:
+      - objectTemplate: pod.yml
+        replicas: 1
+        inputVars:
+          containerImage: registry.k8s.io/pause:3.1

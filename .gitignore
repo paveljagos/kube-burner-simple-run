@@ -1,0 +1,10 @@
+wp/* 
+wp-24cpu/*
+wp-34cpu/*
+wp-44cpu/*
+wp-54cpu/*
+
+*.duckdb
+
+.RData
+.Rhistory
